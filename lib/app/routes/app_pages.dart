@@ -17,7 +17,7 @@ abstract class AppPages{
     ),
     GetPage(
         name: AppRoutes.dashboard,
-        page: ()=> const DashboardView(),
+        page: ()=> DashboardView(),
         binding: DashboardBinding()
     ),
     GetPage(

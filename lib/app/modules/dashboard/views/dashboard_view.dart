@@ -1,12 +1,21 @@
-import 'package:demo_use/app/modules/dashboard/controllers/dashboard_controller.dart';
+import 'package:demo_use/app/data/models/todo_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:location/location.dart';
+
+import '../../../services/localization_service.dart';
+import '../../../services/location_service.dart';
+import '../controllers/dashboard_controller.dart';
+import 'widgets/todo_card.dart';
 
 class DashboardView extends GetView<DashboardController> {
-  const DashboardView({Key? key}) : super(key: key);
+  DashboardView({Key? key}) : super(key: key);
+
+  // final LocationService location = Get.find<LocationService>();
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -22,6 +31,16 @@ class DashboardView extends GetView<DashboardController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Text('hello'.tr, style: const TextStyle(color: Colors.grey),),
+            const SizedBox(height: 20),
+            DropdownButton(
+              icon: const Icon(Icons.arrow_drop_down),
+              value: controller.selectedLang.value,
+              items: LocalizationService.langs.map((String lang) {
+                return DropdownMenuItem(value: lang, child: Text(lang));
+              }).toList(),
+              onChanged: controller.onChangeLocalization,
+            ),
             Text(
               "TODO List",
               style: Theme.of(context).textTheme.headline4,
@@ -36,12 +55,9 @@ class DashboardView extends GetView<DashboardController> {
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      bool status = controller
-                          .addTodoList(controller.controllerTodo.text);
+                      bool status = controller.addTodoList(controller.controllerTodo.text);
                       if (!status) {
-                        Get.defaultDialog(
-                            title: "Text Empty",
-                            middleText: "Please Enter Todo.");
+                        Get.defaultDialog(title: "Text Empty", middleText: "Please Enter Todo.");
                       }
                     },
                     child: const Text("Add Todo")),
@@ -50,25 +66,36 @@ class DashboardView extends GetView<DashboardController> {
             const SizedBox(
               height: 10,
             ),
-            ObxValue<RxList>(
+            ElevatedButton(
+                onPressed: () {
+                  controller.getTodoList();
+                },
+                child: const Text("Get Todo List")),
+            const SizedBox(
+              height: 10,
+            ),
+            ObxValue<RxList<TodoDetail>>(
                 (p0) => Expanded(
-                        child: Column(
-                      children: p0
-                          .asMap()
-                          .map(
-                            (key, value) => MapEntry(
-                              key,
-                              Text(value),
-                            ),
-                          )
-                          .values
-                          .toList(),
+                        child: SingleChildScrollView(
+                      child: Column(
+                        children: p0.reversed
+                            .toList()
+                            .asMap()
+                            .map(
+                              (key, value) => MapEntry(
+                                  key,
+                                  TodoCard(
+                                    detail: value,
+                                  )),
+                            )
+                            .values
+                            .toList(),
+                      ),
                     )),
                 controller.todoList),
             // Obx((){
             //   return Text(controller.todoList.length.toString());
             // }),
-            ObxValue<RxInt>((p0) => Text(p0.toString()), controller.dex)
           ],
         ),
       ),

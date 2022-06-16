@@ -60,6 +60,31 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    def environment = 'env-'
+    flavorDimensions environment
+
+    productFlavors {
+       demoUseDev {
+            dimension environment
+            applicationIdSuffix = ".dev"
+            resValue "string", "app_name", "Dev Demo Use"
+            versionCode = 1
+            versionName = "0.0.1"
+        }
+        demoUseStaging {
+            dimension environment
+            resValue "string", "app_name", "Stg Demo Use"
+            versionCode = 1
+            versionName = "0.0.1"
+        }
+        demoUse {
+            dimension environment
+            resValue "string", "app_name", "Demo Use"
+            versionCode = 1
+            versionName = "0.0.1"
+        }
+    }
 }
 
 flutter {
